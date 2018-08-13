@@ -8,18 +8,17 @@
 
 import UIKit
 
-class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDelegate {
+class ViewController: UIViewController {
 
     @IBOutlet weak var chordTitleLabel: UILabel!
-    @IBOutlet weak var pickerView: UIPickerView!
     @IBOutlet weak var keysLabel: UILabel!
     @IBOutlet weak var chordDescription: UILabel!
+    @IBOutlet weak var chordTextField: UITextField!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        pickerView.dataSource = self
-
         keys.append(c)
         keys.append(cSharp)
         keys.append(d)
@@ -32,8 +31,10 @@ class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDeleg
         keys.append(a)
         keys.append(bFlat)
         keys.append(b)
-        
         print(c.getMajor())
+        
+        createChordFinder()
+        
     }
     
     override func didReceiveMemoryWarning() {
@@ -41,7 +42,7 @@ class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDeleg
         // Dispose of any resources that can be recreated.
     }
     
-    let chords = ["major", "minor", "diminished", "augmented", "major 7th", "minor 7th", "dominant 7th", "major 6th", "minor 6th", "diminished 7th", "augmented 7th", "dominant 7th b5th", "major 7th b3rd", "minor 7th b5th", "dominant 7th sus 4th"]
+    let chords = ["--", "major", "minor", "diminished", "augmented", "major 7th", "minor 7th", "dominant 7th", "major 6th", "minor 6th", "diminished 7th", "augmented 7th", "dom 7th b5th", "major 7th b3rd", "minor 7th b5th", "dom 7th sus 4th"]
     
     var keys = [Key]()
     let c = Key(named: "C", placedAt: 1)
@@ -57,7 +58,36 @@ class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDeleg
     let bFlat = Key(named: "Bb", placedAt: 11)
     let b = Key(named: "B", placedAt: 12)
     
+    func createChordFinder() {
+        let chordFinder = UIPickerView()
+        chordFinder.delegate = self
+        chordTextField.inputView = chordFinder
+        createToolbar()
+        
+        //Custom
+        chordFinder.backgroundColor = .white
+        
+    }
     
+    func createToolbar() {
+        let toolBar = UIToolbar()
+        toolBar.sizeToFit()
+        
+        let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(ViewController.dismissKeyboard))
+        
+        toolBar.setItems([doneButton], animated: false)
+        toolBar.isUserInteractionEnabled = true
+        
+        chordTextField.inputAccessoryView = toolBar
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+}
+
+extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 2
@@ -82,7 +112,7 @@ class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDeleg
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let key = keys[pickerView.selectedRow(inComponent: 0)].getKeyName()
         let chord = chords[pickerView.selectedRow(inComponent: 1)]
-        chordTitleLabel.text = "\(key) \(chord)"
+        chordTextField.text = "\(key) \(chord)"
         
         if chord.elementsEqual("major") {
             keysLabel.text = keys[pickerView.selectedRow(inComponent: 0)].getMajor()
@@ -117,7 +147,7 @@ class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDeleg
         } else if chord.elementsEqual("augmented 7th") {
             keysLabel.text = keys[pickerView.selectedRow(inComponent: 0)].getAug7th()
             chordDescription.text = Key.augmented7thDescrip
-        } else if chord.elementsEqual("dominant 7th b5th") {
+        } else if chord.elementsEqual("dom 7th b5th") {
             keysLabel.text = keys[pickerView.selectedRow(inComponent: 0)].getDom7thb5()
             chordDescription.text = Key.dom7thb5Descrip
         } else if chord.elementsEqual("major 7th b3rd") {
@@ -126,12 +156,11 @@ class ViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDeleg
         } else if chord.elementsEqual("minor 7th b5th") {
             keysLabel.text = keys[pickerView.selectedRow(inComponent: 0)].getMin7thb5()
             chordDescription.text = Key.min7thb5Descrip
-        } else if chord.elementsEqual("dominant 7th sus 4th") {
+        } else if chord.elementsEqual("dom 7th sus 4th") {
             keysLabel.text = keys[pickerView.selectedRow(inComponent: 0)].getDom7thSus4()
             chordDescription.text = Key.dom7thSus4Descrip
         }
         
     }
-    
 }
 
